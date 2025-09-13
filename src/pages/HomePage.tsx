@@ -6,15 +6,16 @@ import BannerSlider from '../components/common/BannerSlider';
 import LoyaltyProgressBar from '../components/common/LoyaltyProgressBar';
 import ProductCard from '../components/common/ProductCard';
 import PinCodeSelector from '../components/common/PinCodeSelector';
-import { sampleBanners, sampleCategories, sampleProducts } from '../data/sampleData';
 import { PinCode } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import { useAdminData } from '../hooks/useAdminData';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage';
 
 const HomePage: React.FC = () => {
   const [isPinSelectorOpen, setIsPinSelectorOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<PinCode | null>(null);
   const { user } = useAuth();
+  const { banners, categories, products } = useAdminData();
 
   useEffect(() => {
     const savedPin = getFromLocalStorage<PinCode | null>(LOCAL_STORAGE_KEYS.USER_PIN, null);
@@ -31,7 +32,7 @@ const HomePage: React.FC = () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.USER_PIN, JSON.stringify(pinCode));
   };
 
-  const freshTodayProducts = sampleProducts.slice(0, 12);
+  const freshTodayProducts = products.filter(p => p.isAvailable).slice(0, 12);
   const canUseLoyalty = user && user.loyaltyPoints >= 300;
 
   if (!selectedPin) {
@@ -63,7 +64,7 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="px-4 pt-6 pb-8">
         <div className="max-w-7xl mx-auto">
-          <BannerSlider banners={sampleBanners} />
+          <BannerSlider banners={banners.filter(b => b.isActive)} />
           
           {/* Welcome Message */}
           <motion.div
@@ -112,7 +113,7 @@ const HomePage: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {sampleCategories.slice(0, 8).map((category, index) => {
+              {categories.filter(c => c.isActive).slice(0, 8).map((category, index) => {
                 // Map category names to appropriate icons
                 let CategoryIcon;
                 let iconColor;

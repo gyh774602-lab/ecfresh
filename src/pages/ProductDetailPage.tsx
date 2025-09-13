@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ChevronRight, Info, Clock, Award, Plus, Minus, ShoppingCart, Salad, Coffee, Carrot } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
 import { Product, ProductVariant } from '../types';
-import { sampleProducts } from '../data/sampleData';
+import { useAdminData } from '../hooks/useAdminData';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../utils/localStorage';
 import { getAvailableTimeSlots, formatTimeSlot } from '../utils/timeSlots';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ const ProductDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart, items } = useCart();
   const { toggle: toggleWishlistGlobal, isWishlisted } = useWishlist();
+  const { products } = useAdminData();
   const navigate = useNavigate();
 
   // Fetch product data
@@ -27,14 +28,14 @@ const ProductDetailPage: React.FC = () => {
     // Simulate API call with timeout
     setIsLoading(true);
     setTimeout(() => {
-      const foundProduct = sampleProducts.find(p => p.id === productId);
+      const foundProduct = products.find(p => p.id === productId);
       if (foundProduct) {
         setProduct(foundProduct);
         setSelectedVariant(foundProduct.variants[0]);
       }
       setIsLoading(false);
     }, 500);
-  }, [productId]);
+  }, [productId, products]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });

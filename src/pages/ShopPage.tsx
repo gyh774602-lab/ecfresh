@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Filter, Grid, List, Search } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
-import { sampleProducts, sampleCategories } from '../data/sampleData';
+import { useAdminData } from '../hooks/useAdminData';
 
 const ShopPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -12,9 +12,10 @@ const ShopPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [showFilters, setShowFilters] = useState(false);
+  const { products, categories } = useAdminData();
 
   const filteredProducts = useMemo(() => {
-    let filtered = sampleProducts;
+    let filtered = products.filter(p => p.isAvailable);
 
     if (selectedCategory) {
       filtered = filtered.filter(product => product.category === selectedCategory);
@@ -43,7 +44,7 @@ const ShopPage: React.FC = () => {
     return filtered;
   }, [selectedCategory, searchTerm, sortBy]);
 
-  const selectedCategoryName = sampleCategories.find(cat => cat.id === selectedCategory)?.name;
+  const selectedCategoryName = categories.find(cat => cat.id === selectedCategory)?.name;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50">
@@ -131,7 +132,7 @@ const ShopPage: React.FC = () => {
             >
               All Categories
             </button>
-            {sampleCategories.map(category => (
+            {categories.filter(c => c.isActive).map(category => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
